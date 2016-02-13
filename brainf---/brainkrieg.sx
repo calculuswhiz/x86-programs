@@ -1,6 +1,8 @@
 // Assembly brainf*** interpreter
 // Alternative name: "ASSembly brainF*** interpretER"
-// Compiles with `gcc -nostdlib`
+// Compiles with `gcc -nostdlib brainkrieg.sx -o brainkrieg`
+// Usage: ./brainkrieg "filename"
+// Return 0 if normal exit
 #define SYS_READ    $0
 #define SYS_WRITE   $1
 #define SYS_OPEN    $2
@@ -213,7 +215,7 @@ _start:
         donematch2:
         jmp     fetch
     
-    scram:
+    scram:      // Memory breached
     movq    $0x7f, err_val
     
     shutdown:
