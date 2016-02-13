@@ -1,4 +1,5 @@
 // Assembly brainf*** interpreter
+// Alternative name: "ASSembly brainF*** interpretER"
 // Compiles with `gcc -nostdlib`
 #define SYS_READ    $0
 #define SYS_WRITE   $1
@@ -88,7 +89,7 @@ _start:
     fetch:
         movq    inst_ptr, %rbx
         cmpq    end, %rbx
-        ja      shutdown            // Boundary reached
+        ja      shutdown            // End of code
         movb    (%rbx), %al
         incq    %rbx
         movq    %rbx, inst_ptr
@@ -162,14 +163,14 @@ _start:
             je      scram
             incq    inst_ptr
             jmp     matchfwd
-            no_smph:
+            no_smph:    // no semaphore needed
             cmpb    $'], %al
             je      check_smph
             cmpq    end, %rbx
             je      scram
             incq    inst_ptr
             jmp     matchfwd
-            check_smph:
+            check_smph:     // check if semaphore set
             cmpq    $0, brack_smph
             jz      donematch
             decq    brack_smph
@@ -192,14 +193,14 @@ _start:
             je      scram
             decq    inst_ptr
             jmp     matchbwd
-            no_smph2:
+            no_smph2:   // no semaphore needed
             cmpb    $'[, %al
             je      check_smph2
             cmpq    head, %rbx
             je      scram
             decq    inst_ptr
             jmp     matchbwd
-            check_smph2:
+            check_smph2:    // check if semaphore set
             cmpq    $0, brack_smph
             jz      donematch2
             decq    brack_smph
