@@ -1,3 +1,4 @@
+[ I am not the author of this file. --Calculuswhiz ]
 [+++++++.+++.][   <- If you get this nl your loops are fucked. ->
 
     This routine is a demonstration of checking for the three cell sizes
