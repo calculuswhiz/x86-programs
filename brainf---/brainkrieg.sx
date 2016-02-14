@@ -22,6 +22,9 @@
 #define MAP_PRIVATE $0x02
 #define STDIN       $0
 #define STDOUT      $1
+#define STDERR      $2
+
+#define DEBUGMODE   0
 
 .global _start
 .text
@@ -96,6 +99,16 @@ _start:
         incq    %rbx
         movq    %rbx, inst_ptr
     decode:
+        #if DEBUGMODE
+            movb    %al, debugChar
+            movq    $1, %rdx
+            movq    $debugChar, %rsi
+            movq    STDERR, %rdi
+            movq    SYS_WRITE, %rax
+            syscall
+            ERRCHECK    -1
+            movzbq  debugChar, %rax
+        #endif
         mov     $branch_table, %rcx
         jmp     *(%rcx,%rax,8)
     // execute:
@@ -111,11 +124,11 @@ _start:
         jmp     fetch
     dec_data:
         movq    data_ptr, %rbx
-        decq    (%rbx)
+        decb    (%rbx)
         jmp     fetch
     inc_data:
         movq    data_ptr, %rbx
-        incq    (%rbx)
+        incb    (%rbx)
         jmp     fetch
     out_data:
         movq    $1, %rdx
@@ -279,6 +292,11 @@ brack_smph:    // Bracket matching semaphore
 junkChar:       // Also used to check if input was used.
     .byte   0
 
+#if DEBUGMODE
+debugChar:
+    .byte   0
+#endif
+
 err_val:
     .byte   0
     
@@ -301,6 +319,6 @@ inst_ptr:
 data_ptr:
     .quad   0
 tape:
-    .zero   30000
+    .zero   (1<<20)
 endtape:
     .zero   1
