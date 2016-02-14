@@ -92,27 +92,12 @@ _start:
         movq    inst_ptr, %rbx
         cmpq    end, %rbx
         ja      shutdown            // End of code
-        movb    (%rbx), %al
+        movzbq  (%rbx), %rax
         incq    %rbx
         movq    %rbx, inst_ptr
     decode:
-        cmpb    $'+, %al
-        je      inc_data
-        cmpb    $'-, %al
-        je      dec_data
-        cmpb    $'>, %al
-        je      dp_right
-        cmpb    $'<, %al
-        je      dp_left
-        cmpb    $'[, %al
-        je      brf
-        cmpb    $'], %al
-        je      brb
-        cmpb    $'., %al
-        je      out_data
-        cmpb    $',, %al
-        je      in_data
-        jmp     fetch
+        mov     $branch_table, %rcx
+        jmp     *(%rcx,%rax,8)
     // execute:
     dp_left:
         cmpq    $tape, data_ptr
@@ -258,6 +243,36 @@ fs_error:
     syscall                         // exit(-1)
 
 .data
+branch_table:
+    .rept   43
+    .quad   fetch
+    .endr
+    
+    .quad   inc_data
+    .quad   in_data
+    .quad   dec_data
+    .quad   out_data
+    
+    .rept   13
+    .quad   fetch
+    .endr
+    
+    .quad   dp_left
+    .quad   fetch
+    .quad   dp_right
+    
+    .rept   28
+    .quad   fetch
+    .endr
+    
+    .quad   brf
+    .quad   fetch
+    .quad   brb
+    
+    .rept   162
+    .quad   fetch
+    .endr
+
 brack_smph:    // Bracket matching semaphore
     .quad   0
 
@@ -267,6 +282,7 @@ junkChar:       // Also used to check if input was used.
 err_val:
     .byte   0
     
+// fstat:
 statstruct:     // This struct is 144 bytes. Only want size (+48)
     .zero FSIZEOFF
     filesize:  // 8 bytes.
