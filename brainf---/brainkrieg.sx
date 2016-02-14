@@ -286,6 +286,7 @@ branch_table:
     .quad   fetch
     .endr
 
+.bss
 brack_smph:    // Bracket matching semaphore
     .quad   0
 
@@ -317,7 +318,7 @@ inst_ptr:
     
 // Data:
 data_ptr:
-    .quad   0
+    .quad   0    
 tape:
     .zero   (1<<20)
 endtape:
